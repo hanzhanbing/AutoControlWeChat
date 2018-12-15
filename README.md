@@ -1,0 +1,2 @@
+# AutoControlWeChat
+基于AccessibilityService实现微信消息的自动发送
