@@ -43,15 +43,6 @@ public class ControlService extends AccessibilityService {
     private String chatuiusernameid = "j6";  //  j1
     private String chatuiswitchid = "aic";   //  aen
 
-    /**
-     * 聊天对象
-     */
-    private String ChatName;
-    /**
-     * 聊天最新一条记录
-     */
-    private String ChatRecord = "test";
-
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -64,7 +55,7 @@ public class ControlService extends AccessibilityService {
                 if (WeChat_PNAME.equals(event.getPackageName().toString())) {
                     sendNotifacationReply(event);
                 }
-                break;
+            break;
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED: //32
                 //如果是主动发送消息，成功之后  就不能继续监听事件了
                 //如果不是主动发送消息，那么 根本没必要监听这个事件，被动接收消息，都是监听通知栏变化直接跳转到聊天界面，监听TYPE_WINDOW_CONTENT_CHANGED即可
@@ -80,60 +71,6 @@ public class ControlService extends AccessibilityService {
                         break;
                 }
                 break;
-            //每次在聊天界面中有新消息到来时都出触发该事件
-            case AccessibilityEvent.TYPE_VIEW_SCROLLED: //4096
-                //获取当前聊天页面的根布局
-                AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-                //获取聊天信息
-                getWeChatLog(rootNode);
-                break;
-        }
-    }
-
-    /**
-     * 遍历
-     *
-     * @param rootNode
-     */
-
-    private void getWeChatLog(AccessibilityNodeInfo rootNode) {
-        if (rootNode != null) {
-            //获取所有聊天的线性布局
-            List<AccessibilityNodeInfo> listChatRecord = rootNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/o");
-            if(listChatRecord.size()==0){
-                return;
-            }
-            //获取最后一行聊天的线性布局（即是最新的那条消息）
-            AccessibilityNodeInfo finalNode = listChatRecord.get(listChatRecord.size() - 1);
-            //获取聊天对象list（其实只有size为1）
-            List<AccessibilityNodeInfo> imageName = finalNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/i_");
-            //获取聊天信息list（其实只有size为1）
-            List<AccessibilityNodeInfo> record = finalNode.findAccessibilityNodeInfosByViewId("com.tencent.mm:id/ib");
-            if (imageName.size() != 0) {
-                if (record.size() == 0) {
-                    //判断当前这条消息是不是和上一条一样，防止重复
-                    if (!ChatRecord.equals("对方发的是图片或者表情")) {
-                        //获取聊天对象
-                        ChatName = imageName.get(0).getContentDescription().toString().replace("头像", "");
-                        //获取聊天信息
-                        ChatRecord = "对方发的是图片或者表情";
-
-                        Log.e("AAAA", ChatName + "：" + "对方发的是图片或者表情");
-                        Toast.makeText(this, ChatName + "：" + ChatRecord, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    //判断当前这条消息是不是和上一条一样，防止重复
-                    if (!ChatRecord.equals(record.get(0).getText().toString())) {
-                        //获取聊天对象
-                        ChatName = imageName.get(0).getContentDescription().toString().replace("头像", "");
-                        //获取聊天信息
-                        ChatRecord = record.get(0).getText().toString();
-
-                        Log.e("AAAA", ChatName + "：" + ChatRecord);
-                        Toast.makeText(this, ChatName + "：" + ChatRecord, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
         }
     }
 

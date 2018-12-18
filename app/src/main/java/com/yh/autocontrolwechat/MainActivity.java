@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Intent intentOne = new Intent(this, WeChatLogService.class);
-        startService(intentOne);
     }
 
 
@@ -75,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
         intent.setClassName("com.tencent.mm", "com.tencent.mm.ui.LauncherUI");
         startActivity(intent);
-
     }
 
 

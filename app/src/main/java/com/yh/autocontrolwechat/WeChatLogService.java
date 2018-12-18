@@ -1,6 +1,8 @@
 package com.yh.autocontrolwechat;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -20,6 +22,10 @@ import java.util.List;
 public class WeChatLogService extends AccessibilityService {
 
     /**
+     * 微信包名
+     */
+    private final static String WeChat_PNAME = "com.tencent.mm";
+    /**
      * 聊天对象
      */
     private String ChatName;
@@ -30,17 +36,42 @@ public class WeChatLogService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.e("AAAA",  "获取微信聊天记录");
+
+        Log.e("AAAA", "TYPE:" + event.getEventType());
 
         int eventType = event.getEventType();
         switch (eventType) {
+            case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED: //64
+                if (WeChat_PNAME.equals(event.getPackageName().toString())) {
+                    sendNotifacationReply(event);
+                }
+                break;
             //每次在聊天界面中有新消息到来时都出触发该事件
-            case AccessibilityEvent.TYPE_VIEW_SCROLLED:
+            case AccessibilityEvent.TYPE_VIEW_SCROLLED: //4096
                 //获取当前聊天页面的根布局
                 AccessibilityNodeInfo rootNode = getRootInActiveWindow();
                 //获取聊天信息
                 getWeChatLog(rootNode);
                 break;
+        }
+    }
+
+    /**
+     * 获取新消息通知的内容
+     *
+     * @param event 服务事件
+     */
+    private void sendNotifacationReply(AccessibilityEvent event) {
+        if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
+            Notification notification = (Notification) event.getParcelableData();
+            String content = notification.tickerText.toString();
+            String[] cc = content.split(":");
+
+            String receiveName = cc[0].trim();
+            String receciveScontent = cc[1].trim();
+
+            Log.e("AAAA", "用户名:" + receiveName + "  消息内容:" + receciveScontent);
+            Toast.makeText(this, content, Toast.LENGTH_LONG).show();
         }
     }
 
